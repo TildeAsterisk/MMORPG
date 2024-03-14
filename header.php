@@ -66,7 +66,8 @@ include_once("connection.php");
 
           <hr>
           <div id="navbar">
-            <a href="main.php">Home</a>
+            <!--a href="main.php">Home</a-->
+            <a href="quest.php">Quest</a>
             <!--a href="profile.php">Profile</a-->
             <a href="jobs.php">Jobs</a>
             <a href="inventory.php">Inventory</a>

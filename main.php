@@ -15,6 +15,7 @@ else{
 * Message Inbox<br>
 * Player Logs<br>
 * Inventory (Compact)<br>
+* Questing
 
   <?php
 }
