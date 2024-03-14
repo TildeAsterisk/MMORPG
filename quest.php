@@ -31,6 +31,7 @@ function GenerateQuestActionButtons($actionOptions){
 
 if(isset($_POST['action'])){
   //You selected an action
+  echo "You chose to {$_POST['action']}.<br><br>";
   //echo "You have chosen to: {$_POST['action']}<br><br>";
   //echo "Your quest data: {$_POST['questData']}<br><br>";
 
@@ -111,7 +112,7 @@ if(isset($_POST['action'])){
     //unset($nextActionOptions['action3']);
   }
 
-  echo "You chose to {$_POST['action']}.<br>";
+  //echo "You chose to {$_POST['action']}.<br>";
 
   //Generate next actions based on current quest data
   GenerateQuestActionButtons($nextActionOptions); 
