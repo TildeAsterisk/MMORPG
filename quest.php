@@ -185,8 +185,6 @@ if(isset($_POST['action'])){
   //Decode quest data
   $questDataDecoded=json_decode($_POST['questData']);
 
-  //Now play game based on decision
-
   // MAIN QUEST STATE MACHINE
   GenerateRandomQuestConfrontation($questDataDecoded);
 
