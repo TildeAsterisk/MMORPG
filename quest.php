@@ -29,51 +29,69 @@ function GenerateQuestActionButtons($actionOptions){
   echo "</center>";
 }
 
-if(isset($_POST['action'])){
-  //You selected an action
-  echo "You chose to {$_POST['action']}.<br><br>";
-  //echo "You have chosen to: {$_POST['action']}<br><br>";
-  //echo "Your quest data: {$_POST['questData']}<br><br>";
 
-  //Decode quest data
-  $questDataDecoded=json_decode($_POST['questData']);
+  //Generate random new confrontation with options based on prev action and quesData
+function GenerateRandomQuestConfrontation($previousAction, $questData){
+  //Display some quest text
+  echo "You were confronted with a <b>{$questData->prevConfrontation}</b>.<br>";
+  echo "You chose to <b>{$previousAction}</b>.<br>";
+  echo "You are in <b>{$questData->location}</b>.<br><br>";
 
   //Default actionOptions
   $nextActionOptions=[
-    "action1"=>["Explore",   
-      [
-        'location'=>'Ship',
-        'goalType'=>'Explore',
-        'transport'=>'Ship'
-      ]
-    ],
-    "action2"=>["Talk",   
-      [
-        'location'=>'Home',
-        'goalType'=>'Build',
-        'transport'=>'Walk'
-      ]
-    ],
-    "action3"=>["Fight",  
-      [
-        'location'=>'Home',
-        'goalType'=>'Work',
-        'transport'=>'Walk'
-      ]
-    ]
+    "action1"=>["Explore",['prevConfrontation'=>"{$questData->prevConfrontation}",'actionType'=>'flight','location'=>"{$questData->location}",'transport'=>'Ship']],
+    "action2"=>["Talk",   ["prevConfrontation"=>"{$questData->prevConfrontation}",'actionType'=>'talk',  'location'=>"{$questData->location}",'transport'=>'Walk']],
+    "action3"=>["Fight",  ["prevConfrontation"=>"{$questData->prevConfrontation}",'actionType'=>'fight', 'location'=>"{$questData->location}",'transport'=>'Walk']]
   ];
 
-  //Now play game based on decision
-
   // MAIN QUEST STATE MACHINE
+  switch ($questData->location){
+    case "Ship":
+      if($previousAction == 'Begin Expedition'&& $questData->location=="Ship"&& $questData->goalType=="Explore"){
+        echo "You are now travelling out in the deep unkown.<br><br>";
+      }      
+
+      //Generate Ship Confrontations
+      // Random Destination, Raided, Obstacle?
+      $random_choice = rand(1,3);
+      switch ($random_choice){
+        case 1:
+          echo "You arrived at <b><i>Random Destination</i></b><br><br>";
+          //set previous confrontation
+          foreach ($nextActionOptions as $key => $value) {
+            $nextActionOptions[$key][1]["prevConfrontation"] = 'Random Destination';
+          }
+          break;
+        case 2:
+          echo "<b><i>You're getting raided!</i></b><br><br>";
+          //NextActionOptions: Negotiate, Fight, Escape
+          $nextActionOptions=[
+            "action1"=>["Negotiate",['prevConfrontation'=>'raid',"actionType"=>'talk',  'location'=>"{$questData->location}",   'transport'=>'Ship']],
+            "action2"=>["Fight",    ['prevConfrontation'=>'raid',"actionType"=>'fight', 'location'=>"{$questData->location}",  'transport'=>'Walk']],
+            "action3"=>["Escape",   ['prevConfrontation'=>'raid',"actionType"=>'flight','location'=>"{$questData->location}", 'transport'=>'Walk']]
+          ];
+          break;
+        case 3:
+          echo "<b><i>You've hit an obstacle</i></b><br><br>";
+          // ???
+          $nextActionOptions=[
+            "action1"=>["Go around it", ['prevConfrontation'=>'obstacle',"actionType"=>'flight','location'=>"{$questData->location}",'goalType'=>'Explore','transport'=>'Ship']],
+            "action2"=>["Investigate",  ['prevConfrontation'=>'obstacle',"actionType"=>'talk',  'location'=>"{$questData->location}",'goalType'=>'Build','transport'=>'Walk']],
+            "action3"=>["Destroy it",   ['prevConfrontation'=>'obstacle',"actionType"=>'fight', 'location'=>"{$questData->location}",'goalType'=>'Work','transport'=>'Walk']]
+          ];
+          break;
+        
+      }
+      break;
+  }
+
   //if prev:Buy Ship AND location:Home
-  if($_POST['action'] == 'Buy Ship'&& $questDataDecoded->location=="Home"){
-    echo "You just bought a ship and are at home.<br>";
+  if($previousAction == 'Buy Ship' && $questData->location=="Home"){
     echo "Would you like to embark on an expedition?<br>";
-    // Explore, location:ship, goalType:explore
     $nextActionOptions['action1'] = [
       "Begin Expedition",
       [
+          'prevConfrontation'=>'new ship',
           'location' => 'Ship',
           'goalType' => 'Explore',
           'transport' => 'Ship'
@@ -82,6 +100,7 @@ if(isset($_POST['action'])){
     $nextActionOptions['action2'] = [
       "Do some more jobs",
       [
+          'prevConfrontation'=>'new ship',
           'location' => 'Home',
           'goalType' => 'Work',
           'transport' => 'Ship'
@@ -90,41 +109,23 @@ if(isset($_POST['action'])){
     unset($nextActionOptions['action3']);
   }
 
-  if($_POST['action'] == 'Begin Expedition'&& $questDataDecoded->location=="Ship"&& $questDataDecoded->goalType=="Explore"){
-    echo "You are now travelling out in the deep unkown.<br>";
-    echo "You either reach safely, get raided, or hit obstacle.<br>";
-    echo "<b>You are confronted.</b><br>";
-    $nextActionOptions['action1'] = [
-      "Continue on journey",
-      [
-          'location' => 'Ship',
-          'goalType' => 'Explore',
-          'transport' => 'Ship'
-      ]
-    ];
-    $nextActionOptions['action2'] = [
-      "Attack fellow traveller",
-      [
-          'location' => 'Ship',
-          'goalType' => 'Combat',
-          'transport' => 'Ship'
-      ]
-    ];
-    $nextActionOptions['action3'] = [
-      "Trade fellow traveller",
-      [
-          'location' => 'Ship',
-          'goalType' => 'Trade',
-          'transport' => 'Ship'
-      ]
-    ];
-    //unset($nextActionOptions['action3']);
-  }
+  //Generate Quest Action Options buttons from $nextActionOptions
+  GenerateQuestActionButtons($nextActionOptions); 
+}
 
-  //echo "You chose to {$_POST['action']}.<br>";
+if(isset($_POST['action'])){
+  //You selected an action
+
+  //Decode quest data
+  $questDataDecoded=json_decode($_POST['questData']);
+
+  //Now play game based on decision
+
+  // MAIN QUEST STATE MACHINE
+  GenerateRandomQuestConfrontation($_POST['action'], $questDataDecoded);
 
   //Generate next actions based on current quest data
-  GenerateQuestActionButtons($nextActionOptions); 
+  //GenerateQuestActionButtons($nextActionOptions); 
 
 }
 //No previous action
@@ -137,16 +138,19 @@ else{
   //Results: Fly away /Continue /Continue
 
   $firstOptions_results=[[
+    'prevConfrontation'=>'ship for sale',
     'location'=>'Home',
     'goalType'=>'Buy',
     'transport'=>'ship'
   ],
   [
+    'prevConfrontation'=>'ship for sale',
     'location'=>'Home',
     'goalType'=>'Build',
     'transport'=>'Walk'
   ],
   [
+    'prevConfrontation'=>'ship for sale',
     'location'=>'Home',
     'goalType'=>'Work',
     'transport'=>'Walk'
