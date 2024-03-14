@@ -37,6 +37,9 @@ function GenerateRandomQuestConfrontation($previousAction, $questData){
   echo "You chose to <b>{$previousAction}</b>.<br>";
   echo "You are in <b>{$questData->location}</b>.<br><br>";
 
+  //Generate some comments based on prev confrontation, prev action and location
+  // Then generate a confrontation with options
+
   //Default actionOptions
   $nextActionOptions=[
     "action1"=>["Explore",['prevConfrontation'=>"{$questData->prevConfrontation}",'actionType'=>'flight','location'=>"{$questData->location}",'transport'=>'Ship']],
@@ -45,8 +48,7 @@ function GenerateRandomQuestConfrontation($previousAction, $questData){
   ];
 
   // MAIN QUEST STATE MACHINE
-  switch ($questData->location){
-    case "Ship":
+  if ($questData->location=="Ship"){
       if($previousAction == 'Begin Expedition'&& $questData->location=="Ship"&& $questData->goalType=="Explore"){
         echo "You are now travelling out in the deep unkown.<br><br>";
       }      
@@ -82,7 +84,7 @@ function GenerateRandomQuestConfrontation($previousAction, $questData){
           break;
         
       }
-      break;
+      
   }
 
   //if prev:Buy Ship AND location:Home
