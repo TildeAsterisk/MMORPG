@@ -13,6 +13,14 @@ else{
 <center><h1>Main Quest</h1></center>
 <?php
 
+//set constants, situations and actions
+define('ACTION_COMBAT', 'combat');
+define('ACTION_TALK', 'talk');
+define('ACTION_MOVE', 'move');
+define('SITUATION_COMBAT', 'combat');
+define('SITUATION_DIALOGUE', 'talk');
+define('SITUATION_OBSTACLE', 'obstacle');
+
 function GenerateQuestActionButtons($actionOptions){
   // Generate next Action Options based on questData
   $actionButtons="";
@@ -23,31 +31,21 @@ function GenerateQuestActionButtons($actionOptions){
     $actionButtons .= "<input type='hidden' name='questData' value='$questDataEncoded'>";
     $actionButtons .= '</form>';
   }
+
   echo "<center><br><hr>
   Choose your action:<br><br>";
   echo $actionButtons;
   echo "</center>";
 }
 
-//set constants, situations and actions
-define('ACTION_COMBAT', 'combat');
-define('ACTION_TALK', 'talk');
-define('ACTION_MOVE', 'move');
-define('SITUATION_COMBAT', 'combat');
-define('SITUATION_DIALOGUE', 'talk');
-define('SITUATION_OBSTACLE', 'obstacle');
-
-//Generate random new confrontation with options based on prev action and quesData
+//Generate random new confrontation with options based on prev action and questData
 function GenerateRandomQuestConfrontation($questData){
   //Display some quest text
-  echo "You were confronted with a <b>{$questData->prevConfrontation}</b>.<br>";
-  echo "You chose to <b>{$questData->actionType}</b>.<br>";
-  echo "You are in <b>{$questData->location}</b>.<br><br>";
+  //echo "You were confronted with a <b>{$questData->prevConfrontation}</b>.<br>";
+  echo "You chose to <b>{$questData->optionText}</b>.<br><br>";
+  //echo "You are in <b>{$questData->location}</b>.<br><br>";
   
   //var_dump($questData);
-
-  //Generate some comments based on prev confrontation, prev action and location
-  // Then generate a confrontation with options
 
   //Default actionOptions
   $nextActionOptions=[
@@ -57,6 +55,7 @@ function GenerateRandomQuestConfrontation($questData){
   ];
 
   // MAIN QUEST STATE MACHINE
+  //Generate some text based on the situational data
   switch ($questData->prevConfrontation){
     case SITUATION_COMBAT:
       switch ($questData->actionType){
@@ -139,12 +138,11 @@ function GenerateRandomQuestConfrontation($questData){
           echo "<b><i>You've hit an obstacle</i></b><br><br>";
           // ???
           $nextActionOptions=[
-            "action1"=>[ACTION_TALK,  ['optionText'=>'Investigate it',  'prevConfrontation'=>SITUATION_OBSTACLE,"actionType"=>ACTION_MOVE,'location'=>"{$questData->location}",'goalType'=>'Explore','transport'=>'Ship']],
-            "action2"=>[ACTION_COMBAT,['optionText'=>'Break it',        'prevConfrontation'=>SITUATION_OBSTACLE,"actionType"=>ACTION_TALK,  'location'=>"{$questData->location}",'goalType'=>'Build','transport'=>'Walk']],
-            "action3"=>[ACTION_MOVE,  ['optionText'=>'Move around it',  'prevConfrontation'=>SITUATION_OBSTACLE,"actionType"=>ACTION_COMBAT, 'location'=>"{$questData->location}",'goalType'=>'Work','transport'=>'Walk']]
+            "action1"=>[ACTION_TALK,  ['optionText'=>'Investigate it',  'prevConfrontation'=>SITUATION_OBSTACLE,"actionType"=>ACTION_TALK,'location'=>"{$questData->location}",'goalType'=>'Explore','transport'=>'Ship']],
+            "action2"=>[ACTION_COMBAT,['optionText'=>'Break it',        'prevConfrontation'=>SITUATION_OBSTACLE,"actionType"=>ACTION_COMBAT,  'location'=>"{$questData->location}",'goalType'=>'Build','transport'=>'Walk']],
+            "action3"=>[ACTION_MOVE,  ['optionText'=>'Move around it',  'prevConfrontation'=>SITUATION_OBSTACLE,"actionType"=>ACTION_MOVE, 'location'=>"{$questData->location}",'goalType'=>'Work','transport'=>'Walk']]
           ];
           break;
-        
       }
       
   }
@@ -237,10 +235,6 @@ else{
   ];
   GenerateQuestActionButtons($firstOptions); 
 }
-?>
-
-
-  <?php
   
 }
 //include("update_stats.php");
