@@ -78,26 +78,40 @@ if(isset($_POST['action'])){
           'transport' => 'Ship'
       ]
     ];
+    $nextActionOptions['action2'] = [
+      "Do some more jobs",
+      [
+          'location' => 'Home',
+          'goalType' => 'Work',
+          'transport' => 'Ship'
+      ]
+    ];
+    unset($nextActionOptions['action3']);
   }
 
   if($_POST['action'] == 'Begin Expedition'&& $questDataDecoded->location=="Ship"&& $questDataDecoded->goalType=="Explore"){
     echo "You are now travelling out in the deep unkown.<br>";
     echo "You either reach safely, get raided, or hit obstacle.<br>";
+    $nextActionOptions['action2'] = [
+      "Attack fellow traveller",
+      [
+          'location' => 'Ship',
+          'goalType' => 'Combat',
+          'transport' => 'Ship'
+      ]
+    ];
+    $nextActionOptions['action3'] = [
+      "Trade fellow traveller",
+      [
+          'location' => 'Ship',
+          'goalType' => 'Trade',
+          'transport' => 'Ship'
+      ]
+    ];
+    //unset($nextActionOptions['action3']);
   }
 
-  switch ($_POST['action']){
-    case "Talk":
-      echo "You are talking to someone.<br>";
-      break;
-    case "Explore":
-      echo "You chose to explore.<br>";
-      break;
-    case "Fight":
-      echo "You chose to fight with someone.<br>";
-      break;
-    default:
-      break;
-  }
+  echo "You chose to {$_POST['action']}.<br>";
 
   //Generate next actions based on current quest data
   GenerateQuestActionButtons($nextActionOptions); 
