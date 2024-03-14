@@ -93,6 +93,15 @@ if(isset($_POST['action'])){
   if($_POST['action'] == 'Begin Expedition'&& $questDataDecoded->location=="Ship"&& $questDataDecoded->goalType=="Explore"){
     echo "You are now travelling out in the deep unkown.<br>";
     echo "You either reach safely, get raided, or hit obstacle.<br>";
+    echo "<b>You are confronted.</b><br>";
+    $nextActionOptions['action1'] = [
+      "Continue on journey",
+      [
+          'location' => 'Ship',
+          'goalType' => 'Explore',
+          'transport' => 'Ship'
+      ]
+    ];
     $nextActionOptions['action2'] = [
       "Attack fellow traveller",
       [
