@@ -14,32 +14,6 @@ else{
 <?php
 
 function GenerateQuestActionButtons($actionOptions){
-  if($actionOptions==null){
-    $actionOptions=[
-      "action1"=>["Move",   
-        [
-          'location'=>'Ship',
-          'goalType'=>'Explore',
-          'transport'=>'ship'
-        ]
-      ],
-      "action2"=>["Talk",   
-        [
-          'location'=>'Home',
-          'goalType'=>'Build',
-          'transport'=>'Walk'
-        ]
-      ],
-      "action3"=>["Fight",  
-        [
-          'location'=>'Home',
-          'goalType'=>'Work',
-          'transport'=>'Walk'
-        ]
-      ]
-    ];
-
-  }
   //$questDataEncoded=json_encode($questData);  
 
   // Generate next Action Options based on questData
@@ -75,7 +49,11 @@ if(isset($_POST['action'])){
   echo "You have chosen to: {$_POST['action']}<br><br>";
   echo "Your quest data: {$_POST['questData']}<br><br>";
 
+  //Decode quest data
+  $questDataDecoded=json_decode($_POST['questData']);
+
   //Now play game based on decision
+
   switch ($_POST['action']){
     case "Talk":
       echo "You are talking to someone.<br>";
@@ -90,7 +68,42 @@ if(isset($_POST['action'])){
       break;
   }
 
-  GenerateQuestActionButtons(null); 
+  //Default actionOptions
+  $nextActionOptions=[
+    "action1"=>["Explore",   
+      [
+        'location'=>'Ship',
+        'goalType'=>'Explore',
+        'transport'=>'Ship'
+      ]
+    ],
+    "action2"=>["Talk",   
+      [
+        'location'=>'Home',
+        'goalType'=>'Build',
+        'transport'=>'Walk'
+      ]
+    ],
+    "action3"=>["Fight",  
+      [
+        'location'=>'Home',
+        'goalType'=>'Work',
+        'transport'=>'Walk'
+      ]
+    ]
+  ];
+
+  //Do something depending on questdata
+  if($questDataDecoded->location == 'Ship'){
+    //if location inside ship
+    echo "You are on the ship.<br>";
+    echo "Would you like to embark on an expedition?<br>";
+    //Generate next Quest Action Options
+    
+  }
+
+  //Generate next actions based on current quest data
+  GenerateQuestActionButtons($nextActionOptions); 
 
   //$questDataDecoded = json_decode($_POST['questData']);
   //Decode it twice....
